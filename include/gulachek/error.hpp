@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <type_traits>
+#include <exception>
 
 namespace gulachek
 {
@@ -14,7 +15,7 @@ namespace gulachek
 		{static_cast<std::size_t>(val)};
 	};
 
-	class GULACHEK_ERROR_API error
+	class GULACHEK_ERROR_API error : public std::exception
 	{
 		enum class standard_code
 		{
@@ -44,29 +45,17 @@ namespace gulachek
 				causes_{other.causes_}
 			{}
 
+			/*
 			error(error &&other) = default;
 			error& operator =(error &&other) = default;
+			error& operator = (const error &other);
+			*/
 
-			error& operator = (const error &other)
-			{
-				error temp{other};
-				std::swap(*this, temp);
-				return *this;
-			}
+			const char *what() const noexcept override;
 
-			operator bool () const
-			{
-				return (code_ != standard_code::generic) ||
-					ucode_ ||
-					ss_.str().size();
-			}
+			operator bool () const;
 
-			static error eof()
-			{
-				error out;
-				out.code_ = standard_code::eof;
-				return out;
-			}
+			static error eof();
 
 			template <user_defined_codeable T>
 			void ucode(T c)
@@ -76,15 +65,7 @@ namespace gulachek
 			bool has_ucode(T c) const
 			{ return ucode_ == static_cast<std::size_t>(c); }
 
-			template <typename T>
-			error& format(const T &rhs)
-			{
-				ss_ << rhs;
-				return *this;
-			}
-
-			bool is_eof() const
-			{ return code_ == standard_code::eof; }
+			bool is_eof() const;
 
 			template <typename T>
 			error& operator << (const T &rhs)
@@ -94,9 +75,21 @@ namespace gulachek
 			void add_cause(Cause &&c)
 			{ causes_.emplace_back(std::forward<Cause>(c)); }
 
+			error wrap() const;
+
 			void output(std::ostream &os) const;
 
 		private:
+			template <typename T>
+			error& format(const T &rhs)
+			{
+				ss_ << rhs;
+				return *this;
+			}
+
+			// conceptually does nothing - just cache memory for what()
+			mutable std::string freeze_msg_;
+
 			standard_code code_;
 			std::size_t ucode_;
 			std::stringstream ss_;

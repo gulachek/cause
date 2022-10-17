@@ -19,5 +19,8 @@
   "homepage": "https://github.com/gulachek/error#readme",
   "devDependencies": {
     "gulpachek": "github:gulachek/gulpachek"
+  },
+  "dependencies": {
+    "bach": "^2.0.1"
   }
 }
