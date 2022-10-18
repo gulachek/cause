@@ -2,14 +2,12 @@
 
 namespace gulachek
 {
-	/*
 	error& error::operator = (const error &other)
 	{
 		error temp{other};
-		std::swap(*this, temp);
+		*this = std::move(temp);
 		return *this;
 	}
-	*/
 
 	void error::output(std::ostream &os) const
 	{

@@ -27,7 +27,7 @@ namespace gulachek
 		public:
 			error(const char* desc = "") :
 				code_{standard_code::generic},
-				ucode_{},
+				ucode_{0},
 				ss_{desc}
 			{}
 
@@ -45,11 +45,8 @@ namespace gulachek
 				causes_{other.causes_}
 			{}
 
-			/*
-			error(error &&other) = default;
-			error& operator =(error &&other) = default;
 			error& operator = (const error &other);
-			*/
+			error& operator = (error &&other) = default;
 
 			const char *what() const noexcept override;
 

@@ -107,3 +107,11 @@ BOOST_AUTO_TEST_CASE(CopyErrorIsStillEof)
 	error copy = eof;
 	BOOST_TEST(copy.is_eof());
 }
+
+BOOST_AUTO_TEST_CASE(CopyAssignmentErrorIsStillEof)
+{
+	auto eof = error::eof();
+	error copy;
+	copy = eof;
+	BOOST_TEST(copy.is_eof());
+}
